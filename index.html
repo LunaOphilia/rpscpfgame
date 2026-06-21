@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=1.5">
+  <title>RPS CPF 模拟器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f5f0eb;
+      font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', '宋体', 'Georgia', 'Times New Roman', serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      margin: 0;
+      line-height: 1.6;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.05);
+      max-width: 580px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      transition: all 0.2s ease;
+      border: 1px solid #ede7dd;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .title {
+      font-size: 2.2rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: #4a3b2f;
+      margin-bottom: 0.4rem;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #b7a694;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .progress {
+      font-size: 0.85rem;
+      color: #9b8b7c;
+      text-align: right;
+      margin-bottom: 1.8rem;
+      font-weight: 300;
+    }
+    .question-text {
+      font-size: 1.3rem;
+      color: #2c2416;
+      margin-bottom: 2rem;
+      font-weight: 450;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .option-btn {
+      background: #faf7f2;
+      border: 1px solid #e0d5c7;
+      border-radius: 2.5rem;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      color: #3e3629;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      font-family: inherit;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .option-btn:hover {
+      background: #f3ede5;
+      border-color: #c9b69b;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+      transform: translateY(-1px);
+    }
+    .option-btn:active {
+      background: #e8ddcf;
+      transform: translateY(0px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .ending-card {
+      text-align: center;
+      padding: 1.5rem 0.5rem;
+    }
+    .ending-title {
+      font-size: 2rem;
+      font-weight: 500;
+      color: #4a3b2f;
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+    .ending-tagline {
+      font-style: italic;
+      color: #8b7a68;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+    .ending-text {
+      color: #2c2416;
+      font-size: 1rem;
+      line-height: 1.8;
+      text-align: left;
+      max-width: 90%;
+      margin: 0 auto;
+      background: #fcf9f5;
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      border: 1px solid #ede3d6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .attribute-box {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+      color: #6b5e4f;
+      background: #f7f3ec;
+      padding: 0.8rem 1.5rem;
+      border-radius: 3rem;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #dbcfbd;
+    }
+    .attr {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .attr-value {
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: #4a3b2f;
+    }
+    .attr-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #aa9b8b;
+    }
+    .restart-btn {
+      margin-top: 2.5rem;
+      background: transparent;
+      border: 1px solid #c9b69b;
+      padding: 0.8rem 2.5rem;
+      border-radius: 2.5rem;
+      font-size: 0.95rem;
+      color: #4a3b2f;
+      cursor: pointer;
+      background: #ffffff;
+      transition: 0.2s;
+      font-family: inherit;
+      letter-spacing: 1px;
+    }
+    .restart-btn:hover {
+      background: #f3ede5;
+      border-color: #a58e72;
+    }
+    .hidden {
+      display: none;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 2rem 1.3rem;
+      }
+      .option-btn {
+        padding: 0.9rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- 动态内容由JS渲染 -->
+</div>
+
+<script>
+  (function() {
+    // ----- 游戏数据 -----
+    const questions = [
+      {
+        id: 1,
+        text: "1. 很平常的休息日晚上，你点开手机上的短视频软件，缓缓响起的“你在我眼中真的很特别”bgm和梦幻的粉色滤镜吸引了你的目光，你揉了揉眼睛，入眼的是——",
+        options: [
+          { text: "A. 热门剧cp的剧情向暧昧剪辑", 提纯底子: 0, 乐子人属性: 0, 开智程度: 0 },
+          { text: "B. 综艺中cp羞涩但又自然的真情互动", 提纯底子: 0, 乐子人属性: 1, 开智程度: 0 },
+          { text: "C. 舞台上cp魅力四射默契十足的表现", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 私下聚会时cp意外流出的一段模糊视频", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 }
+        ]
+      },
+      {
+        id: 2,
+        text: "2. 大数据和推流的大手又开始发力了，你刷到这对cp的频率越来越频繁，让你着魔一般不断看下去的原因是——",
+        options: [
+          { text: "A. 十八层滤镜下，Cp旗鼓相当的颜值", 提纯底子: 0, 乐子人属性: 0, 开智程度: 0 },
+          { text: "B. 不知道是不是演技，Cp间独有的奇妙化学反应", 提纯底子: 0, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. 给我一个完整的故事，cp间独特的人设成长和发展线", 提纯底子: 0, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 别管了，这次真的不一样！", 提纯底子: 0, 乐子人属性: 0, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 3,
+        text: "3. 以往的嗑cp血泪史被你抛之脑后，你决定躬身入局，正式进入cp粉圈，你的身份是——",
+        options: [
+          { text: "A. 我只看看不进去，高贵路人袭来", 提纯底子: 0, 乐子人属性: 2, 开智程度: 1 },
+          { text: "B. 感觉自己萌萌哒，爱复读的@mmr团建中", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. 我手里有8个小号，搓搓搓我是超级zgj", 提纯底子: 2, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 锅铲抡起来了，画画画写写写剪剪剪我是厨子不许打我！", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 }
+        ]
+      },
+      {
+        id: 4,
+        text: "4. 手上忙着，无论如何，同人饭还是要吃的，你的最爱类型是——",
+        options: [
+          { text: "A. 同人女兼职华强北，今天捡到了谁的手机?", 提纯底子: 0, 乐子人属性: 1, 开智程度: 0 },
+          { text: "B. 好想成为npc啊，我在论坛体很想你", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. Au，词牌名，paro，鉴赏高雅文学中", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "D. 心跳慢动作重播，长短领嗑re手书视频", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "E. 属于我的蒙娜丽莎早已遇见，卢浮宫欣赏画作中", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "F. 你们给我亲嘴啊，ai是最伟大的发明", 提纯底子: 0, 乐子人属性: 2, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 5,
+        text: "5. 一千个人心目中有一千个家产，你最爱的风味类型是——",
+        options: [
+          { text: "A. 现背好吃好吃，他们的未来就应该这样发展", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "B. 姐狗yummyyummy，就这个训狗爽吃", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. 天神攻袭来，就爱这种绝对的征服", 提纯底子: 0, 乐子人属性: 1, 开智程度: 0 },
+          { text: "D. 生怀流火葬场，越狗血越美味", 提纯底子: 0, 乐子人属性: 2, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 6,
+        text: "6. 不悲不喜，家产就在那里，补的糖点越多，你的嗑糖模式也渐渐固定，你的依赖路径是——",
+        options: [
+          { text: "A. 我是实证主义介子推，不是双人互动我不吃，宁可枝头抱香死", 提纯底子: 0, 乐子人属性: 0, 开智程度: 2 },
+          { text: "B. 我是李涛战士苏格拉底，激情追问到底为啥呀，爱是唯一解", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. 我是量子纠缠薛定谔，TA的一切就是这么的和TA有关，命运不可言说", 提纯底子: 2, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 我是考古流北派三人，他们在相遇之前的路我也要全部走过", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "E. 我是精神分析弗洛伊德，看看那眼神肢体神态，原因统统都是恋相方癖", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 }
+        ]
+      },
+      {
+        id: 7,
+        text: "7. 你已经抵达家产最深处，你已经几乎补完之前所有的糖点和故事线，接下来你决定——",
+        options: [
+          { text: "A. 不悲不喜，善用拉黑，专注装修自己的信息茧房", 提纯底子: 0, 乐子人属性: 0, 开智程度: 2 },
+          { text: "B. 扩列互月，加群养铁，从零开始的粉圈kol养成之路", 提纯底子: 3, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. 未知苦处，不信神婆，塔罗六爻星盘八字求访中", 提纯底子: 2, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 人脉在此，专注显化，刮刮乐来者不拒很期待哦", 提纯底子: 2, 乐子人属性: 1, 开智程度: 0 },
+          { text: "E. 加减乘除，数字玄机，算出来的奖一个xx手表", 提纯底子: 0, 乐子人属性: 2, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 8,
+        text: "8. 终于等到了新的双人活动，这将是你第一次实时追更家产发展，你采取的行动是——",
+        options: [
+          { text: "A. 大贴脸我来了，横幅应援大旗弹幕，莫忘来时路", 提纯底子: 2, 乐子人属性: 0, 开智程度: 0 },
+          { text: "B. 新的风味将从我手下诞生，姐妹你听我说，我们应该这样嗑", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "C. 逐帧回味仔细品读中，你们两个到底是什么关系", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "D. 感动不已，这就是我精心托举的两个心肝啊", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 9,
+        text: "9. 双人的消息和物料渐渐远去，但是嗑糖的热情从未消减，这时传来了产品其中一方和无关人士的旧绯闻，你的反应是——",
+        options: [
+          { text: "A. 管我屁屁事，左位唯爱友位，右位唯爱左位，是唯爱，你懂是什么", 提纯底子: 0, 乐子人属性: 0, 开智程度: 2 },
+          { text: "B. 那又怎样，ta不过是唯相方性恋罢了，又不是甄姬，过往都是浮云", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "C. 血糖嗑起来，烂人真心，爱上相方的样子果然不一样啊，双标好美味吧", 提纯底子: -1, 乐子人属性: 2, 开智程度: 0 },
+          { text: "D. 正规人士袭来，广场澄清带话题不限圈转发抽奖一条龙", 提纯底子: 2, 乐子人属性: 0, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 10,
+        text: "10. 深入粉圈久了难免接触到这样那样的信息，看到一方唯粉的嘲讽和对上个绯闻的冷嘲热讽，你的看法是——",
+        options: [
+          { text: "A. 歪屁股？什么意思我听不懂呀，我可没有", 提纯底子: 1, 乐子人属性: -1, 开智程度: 0 },
+          { text: "B. 唯粉说话含金量不如一斤鸡屎，专心维护好我的小仙产", 提纯底子: 0, 乐子人属性: 0, 开智程度: 2 },
+          { text: "C. 我才是爸爸妈妈唯一的女儿，我等不死尔等终究为庶", 提纯底子: 3, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 两个人合体分体都是我的好心肝啊我有什么错", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 }
+        ]
+      },
+      {
+        id: 11,
+        text: "11. 没等到双人澄清，反而等到了另一位的单人商务，看着物料上的应援色和糖点小呼应，你的内心感受是——",
+        options: [
+          { text: "A. 哈哈！今天就让你知道谁才是真正的老大，备注晒单一条龙", 提纯底子: 3, 乐子人属性: 0, 开智程度: 0 },
+          { text: "B. 卖货？不要不要，我的钱包只为双代打开", 提纯底子: 0, 乐子人属性: 0, 开智程度: 2 },
+          { text: "C. 商务？来都来了，随便买一点走吧", 提纯底子: 1, 乐子人属性: 0, 开智程度: 0 },
+          { text: "D. 这啥？我真的需要这个吗。但是大家好像都买了", 提纯底子: 2, 乐子人属性: 0, 开智程度: 0 }
+        ]
+      },
+      {
+        id: 12,
+        text: "12. 单人活动也渐渐多了起来，不过不知道为什么一方的活动物料总是比另一个多一些，在这些单人物料中你的感想是——",
+        options: [
+          { text: "A. Ta好爱ta呀，到底是谁才是这段关系里面用情最深的呢？", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1, flag: null },
+          { text: "B. Ta一路走来真的好辛苦呀，ta是ta久经苦难的恩赐", 提纯底子: 5, 乐子人属性: 0, 开智程度: 0, flag: 'choice12_BorE' },
+          { text: "C. 好无聊啊，单人的物料无法媲美双人，想念家产", 提纯底子: 0, 乐子人属性: 0, 开智程度: 2, flag: null },
+          { text: "D. 另一个的公司真是不做人啊，和相方家一比也太不专业了", 提纯底子: 3, 乐子人属性: 0, 开智程度: 0, flag: null },
+          { text: "E. Ta好有爱人的能力，樱花树下站谁都美", 提纯底子: 4, 乐子人属性: 0, 开智程度: 0, flag: 'choice12_BorE' }
+        ]
+      },
+      {
+        id: 13,
+        text: "13. 另一位也有了线下的活动邀约，面对线下见面的机会，你的想法是——",
+        options: [
+          { text: "A. 太不容易了，ta只有我们了，我必然携带应援物前去支持", 提纯底子: 3, 乐子人属性: 0, 开智程度: 0 },
+          { text: "B. 终于能见面，我的大炮已经准备完毕，必然出片记录饭撒", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1 },
+          { text: "C. 我已经准备好战斗，必然让唯粉知道什么是真正的体量", 提纯底子: 2, 乐子人属性: -2, 开智程度: 0 },
+          { text: "D. 单人线下没什么吸引力，捡点吃点，抱朴守真", 提纯底子: 0, 乐子人属性: 1, 开智程度: 2 }
+        ]
+      },
+      {
+        id: 14,
+        text: "14. 夜深人静，你翻看着自己建的双人图楼，又瞟了一眼首页唯粉朋友转发的单人物料。你发现自己最近在想——",
+        options: [
+          { text: "A. 奇怪，以前看双人图会姨母笑，最近反而对某个人的单人cut更心动，我是不是出了问题？", 提纯底子: 2, 乐子人属性: 0, 开智程度: 1 },
+          { text: "B. 两个人的商务，我最近好像都只给一个人晒单了……但我真的不是歪屁股啊，只是他的更需要支持吧？", 提纯底子: 3, 乐子人属性: 0, 开智程度: 0 },
+          { text: "C. 首页的wf又在骂CPF是嗑血糖，虽然很烦，但偶尔确实会想：他看他的那个眼神，是不是真是我过度解读了？", 提纯底子: 1, 乐子人属性: 0, 开智程度: 1 },
+          { text: "D. 无所谓，我还是端水端的很稳。只不过最近总在想，比起强行捆绑，希望两个人能各自发展得更好，各自为王顶峰相见也挺好吧？", 提纯底子: 1, 乐子人属性: 0, 开智程度: 2, hiddenAttr: true },
+          { text: "E. 我管他们想什么，老子爱怎么嗑怎么嗑。即使有一天他们真掰了，那也是我选的路，跪着也走完。", 提纯底子: 0, 乐子人属性: 2, 开智程度: 1 }
+        ]
+      },
+      {
+        id: 15,
+        text: "15. 明面上的提纯大战还是终于拉开了序幕，看到gslm以及两方wf的互撕争吵，你最倾向于——",
+        options: [
+          { text: "A. 本宫的头好痛呀，拜拜就拜拜，下一个更乖", 提纯底子: 0, 乐子人属性: 3, 开智程度: 2, flag: null },
+          { text: "B. Ta为何纵容他的粉丝伤害ta呀，原来利益面前真爱不过如此", 提纯底子: 5, 乐子人属性: 0, 开智程度: 0, flag: null },
+          { text: "C. 关我什么事呢，一心只想嗑cp", 提纯底子: 0, 乐子人属性: 0, 开智程度: 3, flag: 'choice15_C' },
+          { text: "D. 你俩说句话呀，发卖还是挽留别让我猜", 提纯底子: 0, 乐子人属性: 0, 开智程度: 1, flag: 'choice15_D' }
+        ]
+      }
+    ];
+
+    // 结局定义
+    const endings = {
+      END1: {
+        title: "END 1 · 四处皆空",
+        tagline: "我爱的你们现在是资本包装的幻象，那些最初的真实碎片，只有我还记得。",
+        text: "你收拾了自己的心情，把所有双人周边锁进箱子最深处。那些年让你心动的瞬间，你依然愿意相信它们在当时是真实的。只是后来，一切都变成了生意。\n你作出了永世不嗑rps的承诺，并立下家训。\n但偶尔，真的只是偶尔，你还是会想起那个在深夜对着屏幕傻笑的自己。\n不后悔。只是有一点遗憾。"
+      },
+      END2: {
+        title: "END 2 · 陷入循环",
+        tagline: "我们必须想象自己是幸福的。",
+        text: "你脱粉回踩的微博还挂在首页，但手指已经诚实地在搜索新的CP名。\n熟悉的bgm响起，熟悉的粉色滤镜。你看着屏幕里两张新的脸，心跳又漏了一拍。\n“这次真的不一样。”你对自己说。\n上一次你也是这么说的。上上次也是。\n但没关系，幸福本身就是一种想象。而你很擅长想象。\n\n几个星期后，你又在短视频平台刷到了另一对……"
+      },
+      END3: {
+        title: "END 3 · 不死不休",
+        tagline: "我会像鬼一样缠着你们，永远……",
+        text: "爱和恨是同一种东西的两种颜色。你选择了最浓烈的那种。\n你时刻准备着贴脸，用尽难听的话去说。你比任何人都清楚他们的行程，比任何人都勤快地出现在每一个评论区。\n他们说你是黑粉。你不这么认为。\n你只是不能接受，那个曾经让你那么快乐的幻象，是由这两个活生生的人亲手打碎的。\n他们欠你的。你要一笔一笔讨回来。\n永远，永远。"
+      },
+      END4: {
+        title: "END 4 · 谁是赢家？",
+        tagline: "过去的你是笑柄，是投诚书，是虐粉素材。你成为自己过去最恨的人。",
+        text: "你翻看着自己一年前的微博，上面写着“CP粉是最傻的”。你笑了，然后删掉了那条。\n现在的你只给一个人做数据，只买一个人的商务。看到CP粉的发言，你会熟练地甩出那张“提纯流程图”。\n你赢了。\n但偶尔深夜，你会刷到一张双人旧图。你盯着看了很久，然后快速划过。\n你不知道自己在怕什么。\n也不知道这份缺失的感情，还能在别处找到吗。"
+      },
+      END5: {
+        title: "END 5 · 永不相见",
+        tagline: "你只能看着他们渐行渐远。那些同行过的路，是真实的吗？",
+        text: "他们不再同台了。然后是不同框。然后是不同城。\n你早已习惯了分别看他们两个人。一个人的采访，另一个人的综艺。一个人的新剧，另一个人的新歌。\n没有交集。没有提及。没有暗示。\n你偶尔会想起当初他们在舞台上并肩的样子，但那画面已经模糊了，像一张过曝的老照片。\n你问自己，那些同行过的路是真实的吗？\n你没有答案。\n不过从来如此。体面，是成年人最后的温柔。"
+      },
+      END6: {
+        title: "END 6 · 百毒不侵",
+        tagline: "你偶尔会想自己有什么错呢。大家都和我一样就好了。",
+        text: "提纯大战的硝烟从未散去，但你早已学会在炮火中喝茶。\n唯粉说你是歪屁股，资本说你是韭菜，路人说你是疯子。\n你听着，然后继续打开双人超话签到。\n你偶尔会想，自己有什么错呢。你没有伤害任何人，你只是同时喜欢两个人。\n大家都和你一样就好了。世界会简单很多。\n也许最终你依然得不到想要的结果——\n但那又怎样。\n你选择了自己的路。从头到尾，都是你自己选的。"
+      }
+    };
+
+    // 游戏状态
+    let currentQuestionIndex = 0;
+    let attributes = {
+      提纯底子: 0,
+      乐子人属性: 0,
+      开智程度: 0
+    };
+    // 特殊标记
+    let flag12_BorE = false;
+    let flag15_C = false;
+    let flag15_D = false;
+
+    const app = document.getElementById('app');
+
+    // 重置游戏
+    function resetGame() {
+      currentQuestionIndex = 0;
+      attributes = { 提纯底子: 0, 乐子人属性: 0, 开智程度: 0 };
+      flag12_BorE = false;
+      flag15_C = false;
+      flag15_D = false;
+      renderQuestion();
+    }
+
+    // 应用选项效果
+    function applyOption(option) {
+      attributes.提纯底子 += option.提纯底子 || 0;
+      attributes.乐子人属性 += option.乐子人属性 || 0;
+      attributes.开智程度 += option.开智程度 || 0;
+
+      if (option.flag === 'choice12_BorE') {
+        flag12_BorE = true;
+      }
+      if (option.flag === 'choice15_C') {
+        flag15_C = true;
+      }
+      if (option.flag === 'choice15_D') {
+        flag15_D = true;
+      }
+    }
+
+    // 判定结局
+    function determineEnding() {
+      const t = attributes.提纯底子;
+      const l = attributes.乐子人属性;
+      const k = attributes.开智程度;
+
+      // 优先级：END6 > END1 > END4 > END3 > END5 > END2
+      if (k >= 20 && flag15_C) {
+        return 'END6';
+      }
+      if (k >= 17 && t < 10) {
+        return 'END1';
+      }
+      if (t >= 20 && flag12_BorE) {
+        return 'END4';
+      }
+      if (t >= 22 && l <= 3) {
+        return 'END3';
+      }
+      if (k >= 14 && t < 16 && flag15_D) {
+        return 'END5';
+      }
+      if (l >= 14 && k < 10) {
+        return 'END2';
+      }
+      // 保底结局：如果都不满足，按倾向给一个
+      if (t >= 18) return 'END4';
+      if (k >= 15) return 'END1';
+      if (l >= 12) return 'END2';
+      return 'END5'; // 默认体面告别
+    }
+
+    // 渲染结局界面
+    function renderEnding(endingKey) {
+      const ending = endings[endingKey];
+      const html = `
+        <div class="ending-card">
+          <div class="ending-title">${ending.title}</div>
+          <div class="ending-tagline">“${ending.tagline}”</div>
+          <div class="ending-text">${ending.text.replace(/\n/g, '<br>')}</div>
+          <div class="attribute-box">
+            <div class="attr"><span class="attr-value">${attributes.提纯底子}</span><span class="attr-label">提纯底子</span></div>
+            <div class="attr"><span class="attr-value">${attributes.乐子人属性}</span><span class="attr-label">乐子人</span></div>
+            <div class="attr"><span class="attr-value">${attributes.开智程度}</span><span class="attr-label">开智程度</span></div>
+          </div>
+          <button class="restart-btn" id="restartBtn">重新开始</button>
+        </div>
+      `;
+      app.innerHTML = html;
+      document.getElementById('restartBtn').addEventListener('click', resetGame);
+    }
+
+    // 渲染当前问题
+    function renderQuestion() {
+      if (currentQuestionIndex >= questions.length) {
+        const endingKey = determineEnding();
+        renderEnding(endingKey);
+        return;
+      }
+
+      const q = questions[currentQuestionIndex];
+      const progressText = `${currentQuestionIndex + 1} / ${questions.length}`;
+      
+      let optionsHtml = '';
+      q.options.forEach((opt, idx) => {
+        optionsHtml += `<button class="option-btn" data-index="${idx}">${opt.text}</button>`;
+      });
+
+      const html = `
+        <div class="header">
+          <div class="title">RPS CPF</div>
+          <div class="subtitle">模拟器</div>
+        </div>
+        <div class="progress">${progressText}</div>
+        <div class="question-text">${q.text}</div>
+        <div class="options">
+          ${optionsHtml}
+        </div>
+      `;
+      app.innerHTML = html;
+
+      // 绑定选项事件
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const index = parseInt(this.getAttribute('data-index'));
+          const selectedOption = q.options[index];
+          applyOption(selectedOption);
+          currentQuestionIndex++;
+          renderQuestion();
+        });
+      });
+    }
+
+    // 启动游戏
+    renderQuestion();
+  })();
+</script>
+</body>
+</html>
